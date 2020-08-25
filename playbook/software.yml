@@ -1,0 +1,76 @@
+---
+- name: Create Simple API Server
+  hosts: sas
+  become: yes
+  tasks:
+  - name: Disable Root Password
+    user:
+      name: root
+      password: '!'
+  - name: Add Docker GPG
+    apt_key:
+      url: https://download.docker.com/linux/debian/gpg
+      state: present
+  - name: Add Docker Repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/debian buster stable
+      state: present
+      update_cache: yes
+  - name: Install Docker & VSFTPd
+    apt:
+      pkg:
+      - docker-ce
+      - docker-ce-cli
+      - vsftpd
+      - libpam-pwdfile
+      - apache2-utils
+  - name: Add apiadm to Docker Group
+    user:
+      name: apiadm
+      groups: docker
+      append: yes
+  - name: Add docker-compose
+    pip:
+      name: docker-compose
+  - name: Copy VSFTPd vUser Config
+    copy:
+      src: ../vsftpd/vsftpd.conf
+      dest: /etc/vsftpd.conf
+      owner: root
+      group: root
+      mode: u=rw,g=r,o=r
+      backup: yes
+  - name: Create /etc/vsftpd
+    file:
+      path: /etc/vsftpd
+      state: directory
+  - name: Create /etc/vsftpd/user_conf
+    file:
+      path: /etc/vsftpd/user_conf
+      state: directory
+  - name:  Copy pam.d vsftpd_vuser
+    copy:
+      src: ../vsftpd/vsftpd_vuser
+      dest: /etc/pam.d/vsftpd_vuser
+      owner: root
+      group: root
+      mode: u=rw,g=r,o=r
+      backup: yes
+  - name: Add local vuser for permission override
+    user:
+      name: vuserftp
+      shell: /bin/false
+      group: nogroup
+      home: /var/ftphome
+      create_home: no
+  - name: Create vUser Home Directory
+    file:
+      path: /var/ftphome
+      state: directory
+      owner: vuserftp
+      group: nogroup
+  - name: Disable vsftpd Service
+    systemd:
+      name: vsftpd
+      state: stopped
+      enabled: no

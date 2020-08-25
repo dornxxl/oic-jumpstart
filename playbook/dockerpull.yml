@@ -1,0 +1,16 @@
+---
+- name: Preload Docker Image
+  hosts: sas
+  tasks:
+  - name: Pull Portainer Image
+    shell: docker pull portainer/portainer:1.24.1
+  - name: Pull PostgreSQL Image
+    shell: docker pull postgres:11.8
+  - name: Pull Kong Image
+    shell: docker pull kong:2.1
+  - name: Pull Konga Image
+    shell: docker pull pantsel/konga:0.14.9
+  - name: Pull ASP.NET Runtime Image
+    shell: docker pull mcr.microsoft.com/dotnet/core/aspnet:3.1
+  - name: Pull MongoDB Image
+    shell: docker pull mongo:4.2.8

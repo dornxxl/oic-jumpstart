@@ -1,0 +1,71 @@
+---
+- name: Create Simple API Server
+  hosts: sas
+  become: yes
+  become_method: su
+  tasks:
+  - name: Install Require Lib
+    apt:
+      update_cache: yes
+      pkg:
+      - curl
+      - vim
+      - jq
+      - git
+      - apt-transport-https
+      - gnupg
+      - unzip
+      - ca-certificates
+      - gnupg-agent
+      - software-properties-common
+      - python-pip
+      - ufw
+      - sudo
+      - apparmor-profiles
+      - open-vm-tools
+  - name: Add apiadm to SUDO Group
+    user:
+      name: apiadm
+      groups: sudo
+      append: yes
+  - name: Temporary Disable sudo password for apiadm
+    copy:
+      src: ../sudoers/apiadm
+      dest: /etc/sudoers.d/apiadm
+      owner: root
+      group: root
+      mode: 0440
+  - name: Disable IPv6 on all Interface
+    sysctl:
+      name: net.ipv6.conf.all.disable_ipv6
+      value: '1'
+      sysctl_set: yes
+      state: present
+      reload: yes
+  - name: Disable IPv6 on {{ ansible_default_ipv4.interface }}
+    sysctl:
+      name: net.ipv6.conf.{{ ansible_default_ipv4.interface }}.disable_ipv6
+      value: '1'
+      sysctl_set: yes
+      state: present
+      reload: yes
+  - name: Disable IPv6 on lo
+    sysctl:
+      name: net.ipv6.conf.lo.disable_ipv6
+      value: '1'
+      sysctl_set: yes
+      state: present
+      reload: yes
+  - name: Edit SSHD Start IPv4 Only
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^#ListenAddress 0\.0\.0\.0'
+      line: ListenAddress 0.0.0.0
+  - name: Edit SSHD Disable X11 Forwarding
+    lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^X11Forwarding'
+      line: X11Forwarding no
+  - name: Reboot Server
+    reboot:
+      reboot_timeout: 3600

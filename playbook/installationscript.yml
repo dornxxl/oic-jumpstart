@@ -1,0 +1,12 @@
+---
+    - name: Installation Script
+      hosts: sas
+      become: yes
+      tasks:
+      - name: copy installation file
+        copy:
+            src: ../install
+            dest: /home/apiadm/
+            owner: apiadm
+            group: apiadm        
+            mode: preserve
