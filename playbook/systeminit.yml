@@ -66,6 +66,18 @@
       path: /etc/ssh/sshd_config
       regexp: '^X11Forwarding'
       line: X11Forwarding no
+  - name: Copy Disable THP Service file
+    copy: 
+      src: ../systemd/disable-transparent-huge-pages.service
+      dest: /etc/systemd/system/disable-transparent-huge-pages.service
+      owner: root
+      group: root
+      mode: 644
+  - name: Enable Disable THP Service
+    systemd:
+      daemon_reload: yes
+      name: disable-transparent-huge-pages
+      enabled: yes
   - name: Reboot Server
     reboot:
       reboot_timeout: 3600
