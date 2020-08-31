@@ -22,6 +22,7 @@
       - ufw
       - sudo
       - apparmor-profiles
+      - libimage-exiftool-perl
       - open-vm-tools
   - name: Add apiadm to SUDO Group
     user:
