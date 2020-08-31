@@ -4,5 +4,5 @@
       tasks:
       - name: Get installation file
         git:
-          repo: 'https://github.com/dornxxl/jumpstart.git'
+          repo: 'https://github.com/OICCIT/oicgw-jumpvm.git'
           dest: '{{ ansible_env.HOME }}/jumpstart'
